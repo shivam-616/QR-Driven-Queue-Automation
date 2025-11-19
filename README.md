@@ -3,13 +3,13 @@
 A full-stack, real-time queue management system built with Java Spring Boot, WebSockets, and a modern frontend. This application allows for the dynamic creation of custom queues, provides a real-time admin dashboard, and generates QR codes for easy, contactless user registration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java Version](https://img.shields.io/badge/Java-17+-blue.svg)](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+[![Java Version](https://img.shields.io/badge/Java-17+-blue.svg)](https://adoptium.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 
 ## ✨ Live Demo & Features
 
-**Live Application URL:** `https://[YOUR_CLOUD_RUN_URL_HERE]` *(Replace with your actual Cloud Run URL)*
+**Live Application URL:** `[REPLACE_WITH_YOUR_CLOUD_RUN_URL]` 
 
 ---
 
@@ -20,7 +20,7 @@ A full-stack, real-time queue management system built with Java Spring Boot, Web
 * **Live User View**: Users see their position in the queue update in real-time without needing to refresh the page, thanks to **Spring WebSockets** and **STOMP**.
 * **QR Code Generation**: Automatically generates a unique QR code for each queue, allowing users to join instantly by scanning it with their mobile device.
 * **RESTful API with Swagger UI**: A fully documented API for programmatic interaction, with a beautiful Swagger UI interface.
-* **Cloud-Native & Ready for Deployment**: Easily deployable as a Docker container and configured for cloud platforms like Google Cloud Run.
+* **Cloud-Native & Ready for Deployment**: Dockerized application using Eclipse Temurin images, ready for Google Cloud Run.
 
 ## 🛠️ Technology Stack
 
@@ -28,54 +28,77 @@ This project leverages a modern, robust technology stack for a full-featured web
 
 | Component      | Technology                                                              |
 | -------------- | ----------------------------------------------------------------------- |
-| **Backend** | Java 17, Spring Boot 3                                                  |
-| **Database** | MySQL                                                                   |
+| **Backend** | Java 17 (Eclipse Temurin), Spring Boot 3                                |
+| **Database** | MySQL 8.0 (Cloud SQL in Prod, Docker Container Locally)                 |
 | **Real-Time** | Spring WebSockets, STOMP                                                |
 | **Frontend** | HTML5, Tailwind CSS, Vanilla JavaScript                                 |
 | **API Docs** | Springdoc OpenAPI (Swagger UI)                                          |
 | **Deployment** | Docker, Google Cloud Run, GitHub Actions (CI/CD)                        |
 
-## 🚀 Getting Started
+## 🚀 Getting Started Locally
 
-You can run this project locally for development and testing.
+You can run this project locally using Docker Compose.
 
 ### Prerequisites
 
-* Java 17+
-* Apache Maven 3.6+
-* Docker and Docker Compose (Recommended)
+* Docker and Docker Compose installed.
 
-### Local Development with Docker (Recommended)
-
-This is the easiest way to get started, as it handles the database setup for you.
+### Steps
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/shivam-616/Queuing_Managment.git](https://github.com/shivam-616/Queuing_Managment.git)
-    cd Queuing_Managment
+    git clone [https://github.com/shivam-616/QR-Driven-Queue-Automation.git](https://github.com/shivam-616/QR-Driven-Queue-Automation.git)
+    cd QR-Driven-Queue-Automation
     ```
-2.  **Run with Docker Compose:**
-    This single command will build the application image and start both the application and the MySQL database containers.
+
+2.  **Create Environment Configuration:**
+    Create a file named `.env` in the root directory to configure the local database.
+    ```bash
+    # Create .env file
+    echo "DB_DATABASE=queue_db" > .env
+    echo "DB_USERNAME_PLACEHOLDER=root" >> .env
+    echo "DB_PASSWORD_PLACEHOLDER=rootpassword" >> .env
+    ```
+
+3.  **Run with Docker Compose:**
+    This command builds the app and starts the MySQL container.
     ```bash
     docker-compose up --build
     ```
-3.  **Access the application:**
+
+4.  **Access the application:**
     * **Application:** [http://localhost:8080](http://localhost:8080)
     * **API Documentation:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-## ☁️ Cloud Deployment with Google Cloud & GitHub Actions
+## ☁️ Cloud Deployment (CI/CD)
 
-This project is configured for continuous deployment to **Google Cloud Run** using **GitHub Actions**.
+This project includes a secure **GitHub Actions** pipeline that automatically builds and deploys the application to **Google Cloud Run** whenever changes are pushed to the `main` branch.
 
-1.  **Push to `master`**: Every push to the `master` branch will automatically trigger the GitHub Actions workflow.
-2.  **CI/CD Pipeline**: The workflow will:
-    * Build the Docker image.
-    * Push the image to Google Artifact Registry.
-    * Deploy the new image as a revision to the Cloud Run service.
+### Infrastructure Setup (One-time)
+1.  **Google Cloud Project:** Create a project and enable Cloud Run, Cloud SQL, Artifact Registry, and Cloud Build APIs.
+2.  **Cloud SQL:** Create a MySQL 8.0 instance.
+3.  **Artifact Registry:** Create a Docker repository.
+4.  **Service Account:** Create a Service Account with permissions to deploy to Cloud Run and write to Artifact Registry.
+
+### GitHub Secrets Setup
+To enable the automatic deployment, go to your repository **Settings > Secrets and variables > Actions** and add the following secrets:
+
+| Secret Name | Value |
+| :--- | :--- |
+| `GCP_PROJECT_ID` | Your Google Cloud Project ID (e.g., `queue-management-system`) |
+| `GCP_CREDENTIALS` | The JSON key of your Service Account (Github Actions Deployer) |
+| `DB_PASSWORD` | The password for your Cloud SQL database user |
+
+### How it Works
+The workflow is defined in `.github/workflows/deploy.yml`.
+1.  **Push:** You push code to `main`.
+2.  **Build:** GitHub Actions builds the Docker image using `maven:3.9-eclipse-temurin-17`.
+3.  **Publish:** The image is pushed to Google Artifact Registry.
+4.  **Deploy:** The image is deployed to Cloud Run, injecting the database credentials securely as environment variables.
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/shivam-616/Queuing_Managment/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/shivam-616/QR-Driven-Queue-Automation/issues).
 
 1.  Fork the repository.
 2.  Create your feature branch (`git checkout -b feature/NewFeature`).
