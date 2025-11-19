@@ -9,7 +9,7 @@ A full-stack, real-time queue management system built with Java Spring Boot, Web
 
 ## ✨ Live Demo & Features
 
-**Live Application URL:** `[REPLACE_WITH_YOUR_CLOUD_RUN_URL]` 
+**Live Application URL:** [https://queue-management-system-1070272816562.us-central1.run.app/] 
 
 ---
 
