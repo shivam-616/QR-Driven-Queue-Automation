@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-queue-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD_PLACEHOLDER}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - queue-net
+    # Add this healthcheck to ensure MySQL is ready before the app starts
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  queue-management-system:
+    build: .
+    container_name: queue-management-system
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    # Update depends_on to wait for the healthcheck to pass
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${DB_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME_PLACEHOLDER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD_PLACEHOLDER}
+    networks:
+      - queue-net
+
+networks:
+  queue-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
